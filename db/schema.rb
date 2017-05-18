@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170517193139) do
+ActiveRecord::Schema.define(version: 20170518205746) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -26,7 +26,20 @@ ActiveRecord::Schema.define(version: 20170517193139) do
   create_table "papers", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer  "version_id"
   end
+
+  add_index "papers", ["version_id"], name: "index_papers_on_version_id", using: :btree
+
+  create_table "things_versions", force: :cascade do |t|
+    t.integer  "version_id"
+    t.integer  "thing_id"
+    t.string   "thing_type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  add_index "things_versions", ["thing_type", "thing_id"], name: "index_things_versions_on_thing_type_and_thing_id", using: :btree
 
   create_table "versions", force: :cascade do |t|
     t.integer  "number"
@@ -37,17 +50,7 @@ ActiveRecord::Schema.define(version: 20170517193139) do
 
   add_index "versions", ["paper_id"], name: "index_versions_on_paper_id", using: :btree
 
-  create_table "versions_answers", force: :cascade do |t|
-    t.integer  "answer_id"
-    t.integer  "version_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
-  add_index "versions_answers", ["answer_id"], name: "index_versions_answers_on_answer_id", using: :btree
-  add_index "versions_answers", ["version_id"], name: "index_versions_answers_on_version_id", using: :btree
-
+  add_foreign_key "papers", "versions"
+  add_foreign_key "things_versions", "versions"
   add_foreign_key "versions", "papers"
-  add_foreign_key "versions_answers", "answers"
-  add_foreign_key "versions_answers", "versions"
 end
