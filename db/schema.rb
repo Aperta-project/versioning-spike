@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170517155505) do
+ActiveRecord::Schema.define(version: 20170517193139) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -32,7 +32,10 @@ ActiveRecord::Schema.define(version: 20170517155505) do
     t.integer  "number"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer  "paper_id"
   end
+
+  add_index "versions", ["paper_id"], name: "index_versions_on_paper_id", using: :btree
 
   create_table "versions_answers", force: :cascade do |t|
     t.integer  "answer_id"
@@ -44,6 +47,7 @@ ActiveRecord::Schema.define(version: 20170517155505) do
   add_index "versions_answers", ["answer_id"], name: "index_versions_answers_on_answer_id", using: :btree
   add_index "versions_answers", ["version_id"], name: "index_versions_answers_on_version_id", using: :btree
 
+  add_foreign_key "versions", "papers"
   add_foreign_key "versions_answers", "answers"
   add_foreign_key "versions_answers", "versions"
 end
