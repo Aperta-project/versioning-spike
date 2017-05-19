@@ -14,8 +14,9 @@ module Versioned
 
   private
 
+  # Only allow editing the latest version
   def prevent_editing_old_content
-#    fail unless versions.all? { |v| !v.latest? }
+    return false if shared? || !versions.first.latest?
   end
 
   def copy_on_write

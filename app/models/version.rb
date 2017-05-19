@@ -11,6 +11,8 @@ class Version < ActiveRecord::Base
     scope: :paper_id
   }
 
+  default_scope { order(number: :asc) }
+
   def latest?
     paper.latest_version == self
   end

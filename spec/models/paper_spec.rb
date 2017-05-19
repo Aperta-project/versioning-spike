@@ -76,4 +76,17 @@ describe Paper, type: :model do
       end
     end
   end
+
+  describe 'updating an old version' do
+    it 'should fail' do
+      paper.versions.create
+      paper.latest_version.answers.create(name: name, value: value)
+      paper.versions.create
+      paper.latest_version.answers.first.update!(value: Faker::Lorem.word)
+      paper.versions.create
+      expect do
+        paper.versions.first.answers.first.update!(value: Faker::Lorem.word)
+      end.to raise_exception(ActiveRecord::RecordNotSaved)
+    end
+  end
 end
