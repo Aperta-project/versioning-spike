@@ -11,6 +11,10 @@ class Version < ActiveRecord::Base
     scope: :paper_id
   }
 
+  def latest?
+    paper.latest_version == self
+  end
+
   private
 
   def set_version_number
