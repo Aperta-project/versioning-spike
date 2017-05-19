@@ -9,7 +9,7 @@ RSpec.describe Answer, type: :model do
       paper.versions.create
       paper.latest_version.answers.create(name: Faker::Lorem.word, value: Faker::Lorem.word)
       paper.versions.create
-      expect(paper.latest_version.answers.first.shared).to be(true)
+      expect(paper.latest_version.answers.first.shared?).to be(true)
     end
   end
 end
