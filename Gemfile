@@ -5,6 +5,7 @@ gem 'pg'
 gem 'sass-rails', '~> 5.0'
 
 gem 'sdoc', '~> 0.4.0', group: :doc
+gem 'bulk_insert'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
