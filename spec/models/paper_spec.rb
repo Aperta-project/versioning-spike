@@ -34,7 +34,8 @@ describe Paper, type: :model do
     1000.times do
       paper.latest_version.answers.create(name: Faker::Lorem.word, value: Faker::Lorem.word)
     end
-    paper.versions.create
+    # we should be making << 1000 db queries when copying
+    expect { paper.versions.create }.to make_database_queries(count: 0..20)
     expect(paper.latest_version).to_not eq(paper.versions.first)
     expect(paper.latest_version.answers).to eq(paper.versions.first.answers)
   end
