@@ -16,7 +16,7 @@ module Versioned
 
   # Only allow editing the latest version
   def prevent_editing_old_content
-    return false if shared? || !versions.first.latest?
+    raise ActiveRecord::ReadOnlyRecord if shared? || !versions.first.latest?
   end
 
   def copy_on_write

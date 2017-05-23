@@ -1,7 +1,7 @@
 class Version < ActiveRecord::Base
   belongs_to :paper
   has_many :things_versions
-  has_many :answers, source_type: Answer, source: :thing, through: :things_versions
+  has_many :answers, ->(v) { (v.latest? ? all : readonly) }, source_type: Answer, source: :thing, through: :things_versions
 
   before_create :set_version_number
   after_create :copy_things
