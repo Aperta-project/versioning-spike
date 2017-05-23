@@ -1,7 +1,15 @@
 class Version < ActiveRecord::Base
+  def self.has_many_versioned(what)
+    has_many what,
+             (->(v) { v.latest? ? all : readonly }),
+             source_type: what.to_s.camelize.singularize.constantize,
+             source: :thing,
+             through: :things_versions
+  end
+
   belongs_to :paper
   has_many :things_versions
-  has_many :answers, ->(v) { (v.latest? ? all : readonly) }, source_type: Answer, source: :thing, through: :things_versions
+  has_many_versioned :answers
 
   before_create :set_version_number
   after_create :copy_things
