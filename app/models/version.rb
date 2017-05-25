@@ -1,14 +1,13 @@
 class Version < ActiveRecord::Base
   def self.has_many_versioned(what)
+    join_table = "versioned_#{what.to_s.pluralize}".to_sym
+    has_many join_table
     has_many what,
              (->(v) { v.latest? ? all : readonly }),
-             source_type: what.to_s.camelize.singularize.constantize,
-             source: :thing,
-             through: :things_versions
+             through: join_table
   end
 
   belongs_to :paper
-  has_many :things_versions
   has_many_versioned :answers
 
   before_create :set_version_number
@@ -28,7 +27,11 @@ class Version < ActiveRecord::Base
   private
 
   def set_version_number
-    self.number = paper.versions.maximum(:number).try(:+, 1) || 0
+    if paper.latest_version_id.nil?
+      self.number = 0
+    else
+      self.number = paper.versions.maximum(:number) + 1
+    end
   end
 
   def set_paper_latest_version
@@ -36,10 +39,11 @@ class Version < ActiveRecord::Base
   end
 
   def copy_things
-    ThingsVersion.bulk_insert do |worker|
+    return if paper.latest_version_id.nil?
+    VersionedAnswer.bulk_insert do |worker|
       # paper.latest_version is still the old version if this is called before set_paper_latest_version
-      ThingsVersion.where(version: paper.latest_version).pluck(:thing_type, :thing_id).each do |thing_type, thing_id|
-        worker.add(thing_type: thing_type, thing_id: thing_id, version_id: self.id)
+      VersionedAnswer.where(version: paper.latest_version).pluck(:answer_id).each do |answer_id|
+        worker.add(answer_id: answer_id, version_id: self.id)
       end
     end
   end

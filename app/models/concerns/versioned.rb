@@ -2,8 +2,8 @@ module Versioned
   extend ActiveSupport::Concern
 
   included do
-    has_many :things_versions, as: :thing
-    has_many :versions, through: :things_versions
+    has_many :versioned_answers
+    has_many :versions, through: :versioned_answers
     before_update :copy_on_write
     before_update :prevent_editing_old_content
   end
@@ -26,10 +26,10 @@ module Versioned
       dup = self.class.create!(attrs)
       paper = versions.first.paper # All the versions have the same paper, so just grab the first
       # Update all the old versions to point to this copy
-      ThingsVersion
-        .where(thing: self)
+      VersionedAnswer
+        .where(answer: self)
         .where.not(version: paper.latest_version)
-        .update_all(thing_id: dup.id)
+        .update_all(answer_id: dup.id)
     end
   end
 end

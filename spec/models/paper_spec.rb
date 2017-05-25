@@ -66,13 +66,13 @@ describe Paper, type: :model do
           paper.latest_version.answers.create(name: i.to_s, value: Faker::Lorem.unique.word)
         end
         expect(Answer.count).to eq(answer_count)
-        expect(ThingsVersion.count).to eq(answer_count)
+        expect(VersionedAnswer.count).to eq(answer_count)
         (version_count - 1).times do
           paper.versions.create
           paper.latest_version.answers.order('RANDOM()').limit(1).first.update(value: Faker::Lorem.word)
         end
         expect(Answer.count).to eq(answer_count + (version_count - 1))
-        expect(ThingsVersion.count).to eq(answer_count * version_count)
+        expect(VersionedAnswer.count).to eq(answer_count * version_count)
       end
     end
   end
