@@ -10,7 +10,7 @@ describe Paper, type: :model do
     expect { paper.versions.create }.to change { paper.versions.maximum(:number) }.from(0).to(1)
   end
 
-  it 'should update the latest_version belongs_to' do
+it 'should update the latest_version belongs_to' do
     paper.versions.create
     expect { paper.versions.create }.to change { paper.latest_version.number }.from(0).to(1)
   end
@@ -38,6 +38,28 @@ describe Paper, type: :model do
     expect { paper.versions.create }.to make_database_queries(count: 0..20)
     expect(paper.latest_version).to_not eq(paper.versions.first)
     expect(paper.latest_version.answers).to eq(paper.versions.first.answers)
+  end
+
+  describe 'fields on a version' do
+    let(:value) { Faker::Lorem.unique.sentence }
+    let(:new_value) { Faker::Lorem.unique.sentence }
+
+    it 'should be copied to the new version' do
+      paper.versions.create
+      paper.latest_version.update(title: value)
+      expect(paper.latest_version.title).to eq(value)
+      paper.versions.create
+      expect(paper.latest_version.title).to eq(value)
+    end
+
+    it 'should be copied to the new version' do
+      paper.versions.create
+      paper.latest_version.update(title: value)
+      paper.versions.create
+      paper.latest_version.update(title: new_value)
+      expect(paper.latest_version.title).to eq(new_value)
+      expect(paper.versions.first.title).to eq(value)
+    end
   end
 
   describe 'updating an answer' do

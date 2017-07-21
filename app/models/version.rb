@@ -11,6 +11,7 @@ class Version < ActiveRecord::Base
   has_many_versioned :answers
 
   before_create :set_version_number
+  before_create :copy_fields
   after_create :copy_things
   after_create :set_paper_latest_version
 
@@ -38,8 +39,16 @@ class Version < ActiveRecord::Base
     paper.update_attribute(:latest_version_id, id)
   end
 
+  def copy_fields
+    return if paper.latest_version_id.nil?
+    [:title, :abstract].each do |thing|
+      send("#{thing}=".to_sym, paper.latest_version.send(thing))
+    end
+  end
+
   def copy_things
     return if paper.latest_version_id.nil?
+
     VersionedAnswer.bulk_insert do |worker|
       # paper.latest_version is still the old version if this is called before set_paper_latest_version
       VersionedAnswer.where(version: paper.latest_version).pluck(:answer_id).each do |answer_id|
