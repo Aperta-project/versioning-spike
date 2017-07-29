@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170721233513) do
+ActiveRecord::Schema.define(version: 20170729224835) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -31,6 +31,10 @@ ActiveRecord::Schema.define(version: 20170721233513) do
 
   add_index "papers", ["latest_version_id"], name: "index_papers_on_latest_version_id", using: :btree
 
+  create_table "texts", force: :cascade do |t|
+    t.text "text"
+  end
+
   create_table "versioned_answers", id: false, force: :cascade do |t|
     t.integer "version_id"
     t.integer "answer_id"
@@ -46,9 +50,11 @@ ActiveRecord::Schema.define(version: 20170721233513) do
     t.integer  "paper_id"
     t.text     "title"
     t.text     "abstract"
+    t.integer  "text_id",    null: false
   end
 
   add_index "versions", ["paper_id"], name: "index_versions_on_paper_id", using: :btree
+  add_index "versions", ["text_id"], name: "index_versions_on_text_id", using: :btree
 
   add_foreign_key "papers", "versions", column: "latest_version_id"
   add_foreign_key "versioned_answers", "versions"

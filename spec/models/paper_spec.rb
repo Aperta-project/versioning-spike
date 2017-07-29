@@ -62,6 +62,33 @@ it 'should update the latest_version belongs_to' do
     end
   end
 
+  describe 'texts' do
+    let(:text) { Faker::Lorem.unique.paragraphs(5).join("\n") }
+    let(:new_text) { Faker::Lorem.unique.paragraphs(5).join("\n") }
+
+    it 'text_id should copied to the new version' do
+      paper.versions.create
+      paper.latest_version.text.update!(text: text)
+      expect(paper.latest_version.text.text).to eq(text)
+      paper.versions.create
+      expect(paper.latest_version.text.text).to eq(text)
+      expect(paper.versions.first.text_id).to eq(paper.versions.last.text_id)
+    end
+
+    it 'should make a new text when the text is modified' do
+      paper.versions.create
+      paper.latest_version.text.update!(text: text)
+      expect(paper.latest_version.text.text).to eq(text)
+      paper.versions.create
+      expect(paper.latest_version.text.text).to eq(text)
+      paper.latest_version.text.update!(text: new_text)
+      expect(paper.latest_version.text.text).to eq(new_text)
+      expect(paper.versions.first.text.text).to eq(text)
+      expect(paper.versions.first.text_id)
+        .not_to eq(paper.versions.last.text_id)
+    end
+  end
+
   describe 'updating an answer' do
     let(:new_value) { Faker::Lorem.unique.word }
 
