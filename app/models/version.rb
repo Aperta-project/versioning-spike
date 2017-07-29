@@ -15,7 +15,7 @@ class Version < ActiveRecord::Base
   before_create :copy_fields
   after_create :copy_things
   after_create :set_paper_latest_version
-  before_create :copy_texts
+  before_create :create_text
 
   validates :number, uniqueness: {
     scope: :paper_id
@@ -43,17 +43,14 @@ class Version < ActiveRecord::Base
 
   def copy_fields
     return if paper.no_versions?
-    [:title, :abstract].each do |thing|
-      send("#{thing}=".to_sym, paper.latest_version.send(thing))
+    paper.latest_version.attributes.except('number', 'created_at', 'updated_at', 'id').each do |k, v|
+      send("#{k}=".to_sym, v)
     end
   end
 
-  def copy_texts
-    if paper.no_versions?
-      self.text = Text.create! if text.nil?
-    else
-      self.text_id = paper.latest_version.text_id
-    end
+  def create_text
+    return unless paper.no_versions?
+    self.text = Text.create! if text.nil?
   end
 
   def copy_things
