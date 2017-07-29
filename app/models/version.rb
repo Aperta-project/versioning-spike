@@ -28,11 +28,11 @@ class Version < ActiveRecord::Base
   private
 
   def set_version_number
-    if paper.latest_version_id.nil?
-      self.number = 0
-    else
-      self.number = paper.versions.maximum(:number) + 1
-    end
+    self.number = if paper.no_versions?
+                    0
+                  else
+                    paper.versions.maximum(:number) + 1
+                  end
   end
 
   def set_paper_latest_version
@@ -40,7 +40,7 @@ class Version < ActiveRecord::Base
   end
 
   def copy_fields
-    return if paper.latest_version_id.nil?
+    return if paper.no_versions?
     [:title, :abstract].each do |thing|
       send("#{thing}=".to_sym, paper.latest_version.send(thing))
     end
