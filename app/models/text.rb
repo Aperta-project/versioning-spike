@@ -1,3 +1,12 @@
+# This model represents a deduplicated model for a version.
+#
+# This should be used for large fields, e.g. the text of a paper, that may or
+# may not change across versions.
+#
+# This model works by having many versions, and a `belongs_to` relation on
+# version. This `text_id` on version is copied when creating a new version. We
+# then use a copy-on-write system to create a new text if the text is updated.
+
 class Text < ActiveRecord::Base
   has_many :versions
   before_update :copy_on_write

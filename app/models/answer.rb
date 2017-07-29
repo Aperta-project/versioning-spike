@@ -1,3 +1,4 @@
+# This model represents a deduplicated has-many for a version.
 class Answer < ActiveRecord::Base
   has_many :versioned_answers
   has_many :versions, through: :versioned_answers
